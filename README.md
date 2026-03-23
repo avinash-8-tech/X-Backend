@@ -1,6 +1,6 @@
 # X Backend
 
-A production-ready REST API backend for a Twitter/X clone built with Node.js, Express, Prisma, and Better Auth.
+A full-featured REST API backend for a Twitter/X clone with real-time messaging, notifications & media upload — built with Node.js, Express, Prisma, Neon(PostgreSQL), Better Auth, Socket.io and Cloudinary
 
 ## 🌟 Features
 

@@ -32,20 +32,66 @@ A production-ready REST API backend for a Twitter/X clone built with Node.js, Ex
 x-backend/
 ├── src/
 │   ├── config/
-│   │   ├── auth.js         # Better Auth config
-│   │   ├── cloudinary.js   # Cloudinary config
-│   │   └── db.js           # Prisma client
-│   ├── controllers/        # Request/Response handlers
-│   ├── services/           # Business logic + DB queries
-│   ├── routes/             # API routes
-│   ├── middlewares/        # Auth, Error, Upload
-│   ├── utils/              # ApiResponse, ApiError, asyncHandler
-│   ├── socket/             # Socket.io real-time events
-│   └── app.js              # Express app setup
+│   │   ├── auth.js              # Better Auth config
+│   │   ├── cloudinary.js        # Cloudinary config
+│   │   └── db.js                # Prisma client
+│   │
+│   ├── controllers/
+│   │   ├── comment.controller.js
+│   │   ├── follow.controller.js
+│   │   ├── like.controller.js
+│   │   ├── message.controller.js
+│   │   ├── notification.controller.js
+│   │   ├── search.controller.js
+│   │   ├── tweet.controller.js
+│   │   └── user.controller.js
+│   │
+│   ├── middlewares/
+│   │   ├── auth.middleware.js    # JWT verify
+│   │   ├── error.middleware.js   # Global error handler
+│   │   └── upload.middleware.js  # Multer file upload
+│   │
+│   ├── routes/
+│   │   ├── comment.routes.js
+│   │   ├── follow.routes.js
+│   │   ├── like.routes.js
+│   │   ├── message.routes.js
+│   │   ├── notification.routes.js
+│   │   ├── search.routes.js
+│   │   ├── tweet.routes.js
+│   │   └── user.routes.js
+│   │
+│   ├── services/
+│   │   ├── comment.service.js
+│   │   ├── follow.service.js
+│   │   ├── like.service.js
+│   │   ├── message.service.js
+│   │   ├── notification.service.js
+│   │   ├── search.service.js
+│   │   ├── tweet.service.js
+│   │   └── user.service.js
+│   │
+│   ├── socket/
+│   │   └── socket.js            # Socket.io real-time events
+│   │
+│   ├── utils/
+│   │   ├── ApiError.js
+│   │   ├── ApiResponse.js
+│   │   ├── asyncHandler.js
+│   │   └── uploadToCloudinary.js
+│   │
+│   └── app.js                   # Express app setup
+│
 ├── prisma/
-│   └── schema.prisma       # Database schema
-├── .envexample             # Environment variables template
-└── server.js               # Entry point
+│   ├── migrations/              # DB migrations history
+│   ├── prisma.config.js         # Prisma configuration
+│   └── schema.prisma            # Database schema
+│
+├── .envexample                  # Environment variables template
+├── .gitignore
+├── package-lock.json
+├── package.json
+└── server.js                    # Entry point
 ```
 
 ## 🚀 Getting Started
@@ -193,13 +239,6 @@ notification:receive New notification received
 - **Notification** — Like, Follow, Comment notifications
 - **Message** — Direct messages
 - **Account/Session** — Better Auth tables
-
-## 👨‍💻 Author
-
-**Avinash Behra**
-- GitHub: [@avinash-8-tech](https://github.com/avinash-8-tech)
-- Portfolio: [avinash-portfolio-nu.vercel.app](https://avinash-portfolio-nu.vercel.app)
-- LinkedIn: [avinash-behra-0baa34339](https://linkedin.com/in/avinash-behra-0baa34339)
 
 ## 📝 License
 

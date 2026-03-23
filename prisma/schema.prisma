@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  username      String?  @unique
+  name          String
+  password      String?
+  avatar        String?
+  coverImage    String?
+  bio           String?
+  location      String?
+  website       String?
+  isVerified    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Better Auth relations
+  accounts         Account[]
+  sessions         Session[]
+
+  // App relations
+  tweets           Tweet[]
+  likes            Like[]
+  comments         Comment[]
+  followers        Follow[]       @relation("following")
+  following        Follow[]       @relation("follower")
+  notifications    Notification[] @relation("receiver")
+  sentNotifs       Notification[] @relation("sender")
+  sentMessages     Message[]      @relation("sender")
+  receivedMessages Message[]      @relation("receiver")
+}
+
+// ==================
+// BETTER AUTH MODELS
+// ==================
+model Account {
+  id           String    @id @default(cuid())
+  accountId    String
+  providerId   String
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken  String?
+  refreshToken String?
+  idToken      String?
+  expiresAt    DateTime?
+  password     String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ==================
+// TWEET MODEL
+// ==================
+model Tweet {
+  id        String   @id @default(cuid())
+  content   String
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  isRetweet   Boolean @default(false)
+  retweetOfId String?
+  retweetOf   Tweet?  @relation("retweets", fields: [retweetOfId], references: [id], onDelete: SetNull)
+  retweets    Tweet[] @relation("retweets")
+
+  isQuote   Boolean @default(false)
+  quoteOfId String?
+  quoteOf   Tweet?  @relation("quotes", fields: [quoteOfId], references: [id], onDelete: SetNull)
+  quotes    Tweet[] @relation("quotes")
+
+  parentId String?
+  parent   Tweet?  @relation("replies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies  Tweet[] @relation("replies")
+
+  likes    Like[]
+  comments Comment[]
+}
+
+// ==================
+// LIKE MODEL
+// ==================
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tweetId String
+  tweet   Tweet  @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tweetId])
+}
+
+// ==================
+// COMMENT MODEL
+// ==================
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tweetId String
+  tweet   Tweet  @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+}
+
+// ==================
+// FOLLOW MODEL
+// ==================
+model Follow {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  followerId String
+  follower   User   @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+
+  followingId String
+  following   User  @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+// ==================
+// NOTIFICATION MODEL
+// ==================
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  receiverId String
+  receiver   User   @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation("sender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  tweetId String?
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  RETWEET
+  MENTION
+}
+
+// ==================
+// MESSAGE MODEL
+// ==================
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  senderId String
+  sender   User   @relation("sender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId String
+  receiver   User   @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+}
